@@ -203,6 +203,9 @@
 /* Macro to enable additional prototypes under Solaris */
 /* #undef __EXTENSIONS__ */
 
+/* Support nonstandard STDERR redirection, for example "git status ^/dev/null". */
+/* #define REDIRECT_STDERR_WITH_CARET 1 */
+
 #if __GNUC__ >= 3
 #define __warn_unused __attribute__ ((warn_unused_result))
 #define __sentinel __attribute__ ((sentinel))
