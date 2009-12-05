@@ -7,7 +7,7 @@ from os.path import join, dirname, abspath
 from logging import fatal
 
 cwd = os.getcwd()
-VERSION="1.23.1"
+VERSION="1.23.1.1"
 APPNAME="fish"
 
 srcdir = '.'
