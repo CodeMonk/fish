@@ -858,7 +858,9 @@ wchar_t *escape( const wchar_t *in_orig,
 				case L'$':
 				case L' ':
 				case L'#':
+#ifdef REDIRECT_STDERR_WITH_CARET
 				case L'^':
+#endif
 				case L'<':
 				case L'>':
 				case L'(':
