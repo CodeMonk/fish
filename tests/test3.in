@@ -96,7 +96,7 @@ echo Test 7 $res
 set -e t8
 if true
 	set -lx t8 foo
-	if test (../fish -c "echo $t8") = foo
+	if test (../build/default/fish -c "echo $t8") = foo
 		echo Test 8 pass
 	else
 		echo Test 8 fail
@@ -105,7 +105,7 @@ end
 
 # Test if exported variables go out of scope
 
-if test (../fish -c "echo $t8") 
+if test (../build/default/fish -c "echo $t8") 
 	echo Test 9 fail
 else
 	echo Test 9 pass
