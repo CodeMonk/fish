@@ -108,7 +108,7 @@ void kill_add( wchar_t *str )
     if( (clipboard = env_get(L"FISH_CLIPBOARD_CMD")) ) 
     {
         escaped_str = escape( str, 1 );
-		cmd = wcsdupcat(L"echo ", escaped_str, clipboard);
+		cmd = wcsdupcat(L"echo -n", escaped_str, clipboard);
     } 
     else
     {
