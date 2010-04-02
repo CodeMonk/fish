@@ -45,18 +45,24 @@ static ll_node_t /** Last kill string */*kill_last=0, /** Current kill string */
 static wchar_t *cut_buffer=0;
 
 /**
-   Test if the xsel command is installed
+   Test if the xsel command is installed.  Since this is called often, 
+   cache the result.
 */
 static int has_xsel()
 {
-	void *context = halloc(0, 0);
-	wchar_t *path = path_get_path( context, L"xsel" );
-	int res = !!path;
-	halloc_free( context );
+    static int called=0;
+	static int res = 0;
+
+    if (!called) {
+	    void *context = halloc(0, 0);
+	    wchar_t *path = path_get_path( context, L"xsel" );
+	    res = !!path;
+	    halloc_free( context );
+        called = 1;
+    }
+
 	return res;
 }
-
-
 
 /**
    Add the string to the internal killring
@@ -86,28 +92,52 @@ static void kill_add_internal( wchar_t *str )
 
 void kill_add( wchar_t *str )
 {
+	wchar_t *cmd = NULL;
+    wchar_t *escaped_str;
 	kill_add_internal(str);
 
-	if( !has_xsel() )
-		return;
 
-	/* This is for sending the kill to the X copy-and-paste buffer */
-	wchar_t *disp;
-	if( (disp = env_get( L"DISPLAY" )) )
-	{
-		wchar_t *escaped_str = escape( str, 1 );
-		wchar_t *cmd = wcsdupcat(L"echo ", escaped_str, L"|xsel -b" );
-		if( exec_subshell( cmd, 0 ) == -1 )
-		{
-			/* 
-			   Do nothing on failiure
-			*/
-		}
-		
-		free( cut_buffer );
-		free( cmd );
+    /*
+       Check to see if user has set the FISH_CLIPBOARD_CMD variable,
+       and, if so, use it instead of checking the display, etc.
+ 
+       I couldn't think of a safe way to allow overide of the echo
+       command too, so, the command used must accept the input via stdin.
+    */
+    wchar_t *clipboard;
+    if( (clipboard = env_get(L"FISH_CLIPBOARD_CMD")) ) 
+    {
+        escaped_str = escape( str, 1 );
+		cmd = wcsdupcat(L"echo ", escaped_str, clipboard);
+    } 
+    else
+    {
+	    /* This is for sending the kill to the X copy-and-paste buffer */
+	    if( !has_xsel() ) {
+		    return;
+        }
+
+	    wchar_t *disp;
+	    if( (disp = env_get( L"DISPLAY" )) )
+	    {
+            escaped_str = escape( str, 1 );
+		    cmd = wcsdupcat(L"echo ", escaped_str, L"|xsel -b" );
+        }
+    }
+
+    if (cmd != NULL)
+    {
+	    if( exec_subshell( cmd, 0 ) == -1 )
+	    {
+		    /* 
+		    Do nothing on failiure
+		    */
+	    }
+		    
+	    free( cut_buffer );
+	    free( cmd );
 	
-		cut_buffer = escaped_str;
+	    cut_buffer = escaped_str;
 	}
 }
 
