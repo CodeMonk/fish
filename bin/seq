@@ -43,7 +43,7 @@ for i in $from $step $to
 	end
 end
 
-if [ $from -le $to ]
+if [ $step -ge 0 ]
     echo "for( i=$from; i<=$to ; i+=$step ) i;" | bc 
 else
     echo "for( i=$from; i>=$to ; i+=$step ) i;" | bc 
