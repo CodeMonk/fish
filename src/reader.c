@@ -628,15 +628,23 @@ void reader_write_title()
 	{
 		char *n = ttyname( STDIN_FILENO );
 
+        /* Linux consoles do not allow titles */
 		if( contains( term, L"linux" ) )
 		{
 			return;
 		}
 
-		if( strstr( n, "tty" ) || strstr( n, "/vc/") )
-			return;
+        /* Linux /dev/tty does not allow titles */
+		if( strstr( n, "tty" ))
+        {
+            /* On OS X (and possibly BSD), console terminals, that accept titles, are /dev/ttys */
+		    if( !strstr( n, "ttys" ))
+			    return;
+        }
 		
-			
+        /* In Linux, virtual terminals do not allow titles */
+		if( strstr( n, "/vc/") )
+            return;
 	}
 
 	title = function_exists( L"fish_title" )?L"fish_title":DEFAULT_TITLE;
