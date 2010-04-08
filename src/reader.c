@@ -624,7 +624,7 @@ void reader_write_title()
 	  don't. Since we can't see the underlying terminal below screen
 	  there is no way to fix this.
 	*/
-	if( !term || !contains( term, L"xterm", L"screen", L"nxterm", L"rxvt" ) )
+	if( term && !contains( term, L"xterm", L"screen", L"nxterm", L"rxvt" ) )
 	{
 		char *n = ttyname( STDIN_FILENO );
 
